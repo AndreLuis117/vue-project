@@ -1,7 +1,7 @@
 <template>
   <div class="hello">
-    <titulo texto="Aluno" />
-    <div>
+    <titulo :texto="professorId != undefined ? 'Professor: ' + professor.nome : 'Todos os alunos'" />
+    <div v-if="professorId != undefined">
       <input
         type="text"
         placeholder="Nome do Aluno"
@@ -20,7 +20,9 @@
       <tbody v-if="alunos.length">
         <tr v-for="(aluno, index) in alunos" :key="index">
           <td>{{ aluno.id }}</td>
-          <td>{{ aluno.nome }} {{ aluno.sobrenome }}</td>
+          <router-link :to="`/alunoDetalhe/${aluno.id}`" tag="td" style="cursor: pointer">
+            {{ aluno.nome }} {{ aluno.sobrenome }}
+          </router-link>
           <td>
             <button class="btn btn_danger" @click="remover(aluno)">
               Remover
@@ -45,12 +47,14 @@ export default {
     return {
       titulo: "Aluno",
       professorId: this.$route.params.prof_id,
+      professor: {},
       nome: "",
       alunos: [],
     };
   },
   created() {
     if (this.professorId) {
+      this.carregaProfessores();
       this.$http
         .get("http://localhost:3000/alunos?professor.id="+ this.professorId)
         .then((res) => res.json())
@@ -68,6 +72,10 @@ export default {
       let _aluno = {
         nome: this.nome,
         sobrenome: "",
+        professor: {
+          id: this.professor.id,
+          nome: this.professor.nome
+        }
       };
 
       this.$http
@@ -84,6 +92,15 @@ export default {
         this.alunos.splice(indice, 1);
       });
     },
+
+    carregaProfessores(){
+      this.$http
+      .get("http://localhost:3000/professores/" +  this.professorId)
+      .then((res) => res.json())
+      .then(professor => {
+        this.professor = professor
+      });
+    }
   },
 };
 </script>
