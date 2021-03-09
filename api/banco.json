@@ -18,10 +18,10 @@
       "id": 1,
       "nome": "Marcus",
       "sobrenome": "Fenix",
-      "dataNasc" : "01/05/2000",
+      "dataNasc": "01/05/2000",
       "professor": {
-        "id": 1,
-        "nome": "Adam Fenix"
+        "id": 2,
+        "nome": "Luna"
       }
     },
     {
@@ -34,9 +34,10 @@
       }
     },
     {
-      "nome": "Ribamar",
-      "sobrenome": "",
       "id": 3,
+      "nome": "Ribamar",
+      "sobrenome": "Bibiano",
+      "dataNasc": "07/09/1996",
       "professor": {
         "id": 1,
         "nome": "Adam Fenix"
