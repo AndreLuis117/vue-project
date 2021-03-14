@@ -1,0 +1,18 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+
+namespace ProjectSchool_Api.Models
+{
+    public class Aluno
+    {
+        public int Id { get; set; }
+        public string Nome { get; set; }
+        public string Sobrenome { get; set; }
+        public string DataNasc { get; set; }
+        public int ProfessorId { get; set; }
+
+        public Professor Professor { get; set; }
+    }
+}
