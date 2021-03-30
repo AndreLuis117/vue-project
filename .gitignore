@@ -24,4 +24,4 @@ pnpm-debug.log*
 
 # Arquivos dotnet core e ef core
 bin
-objs
+obj
