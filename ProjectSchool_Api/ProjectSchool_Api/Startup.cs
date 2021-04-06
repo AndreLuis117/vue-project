@@ -30,6 +30,9 @@ namespace ProjectSchool_Api
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<DataContext>(x => x.UseSqlite(Configuration.GetConnectionString("DefaultConnection")));
+
+            
+
             services.AddMvc().AddJsonOptions(options => { options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve; });
             services.AddControllers();
             services.AddSwaggerGen(c =>
@@ -38,12 +41,16 @@ namespace ProjectSchool_Api
             });
 
             services.AddScoped<IRepository, Repository>();
+
+            services.AddCors();
         }
 
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            app.UseCors(x => x.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -61,6 +68,8 @@ namespace ProjectSchool_Api
             {
                 endpoints.MapControllers();
             });
+
+           
         }
     }
 }

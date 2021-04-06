@@ -1,7 +1,9 @@
 <template>
-  <div>
+  <div v-if="!loading">
     <titulo :texto="`Aluno ${aluno.nome}`" :btnVoltar="!visualizando">
-      <button v-show="visualizando" class="btn btnEditar" @click="editar()">Editar</button>
+      <button v-show="visualizando" class="btn btnEditar" @click="editar()">
+        Editar
+      </button>
     </titulo>
     <table>
       <tbody>
@@ -12,14 +14,14 @@
           </td>
         </tr>
         <tr>
-          <td class="colPequeno" >Nome:</td>
+          <td class="colPequeno">Nome:</td>
           <td>
             <label v-if="visualizando" for="">{{ aluno.nome }}</label>
             <input v-else v-model="aluno.nome" type="text" />
           </td>
         </tr>
         <tr>
-          <td class="colPequeno" >Sobrenome:</td>
+          <td class="colPequeno">Sobrenome:</td>
           <td>
             <label v-if="visualizando" for="">{{ aluno.sobrenome }}</label>
             <input v-else v-model="aluno.sobrenome" type="text" />
@@ -33,15 +35,18 @@
           </td>
         </tr>
         <tr>
-          <td class="colPequeno" >Professor:</td>
+          <td class="colPequeno">Professor:</td>
           <td>
             <label v-if="visualizando" for="">{{ aluno.professor.nome }}</label>
-            <select v-else v-model="aluno.professor">
-              <option v-for="(professor, index) in professores" :key="index" v-bind:value="professor">
-                {{professor.nome}}
-                </option>            
-
-          </select>
+            <select v-else v-model="aluno.professor.id">
+              <option
+                v-for="(professor, index) in professores"
+                :key="index"
+                v-bind:value="professor.id"
+              >
+                {{ professor.nome }}
+              </option>
+            </select>
           </td>
         </tr>
       </tbody>
@@ -51,10 +56,8 @@
       <div v-if="!visualizando">
         <button class="btn btnSalvar" @click="salvar(aluno)">Salvar</button>
         <button class="btn btnCancelar" @click="cancelar()">Cancelar</button>
-
       </div>
     </div>
-
   </div>
 </template>
 
@@ -69,66 +72,82 @@ export default {
       professores: [],
       aluno: {},
       id: this.$route.params.id,
-      visualizando: true
+      visualizando: true,
+      loading: true,
     };
   },
   created() {
-    this.$http
-      .get("http://localhost:3000/alunos/" + this.id)
-      .then((res) => res.json())
-      .then((aluno) => (this.aluno = aluno));
-    
-    this.$http
-      .get("http://localhost:3000/professores")
-      .then((res) => res.json())
-      .then(professor => this.professores = professor);
+    this.carregarProfessor();
   },
   methods: {
-    editar(){
+    carregarProfessor() {
+      this.$http
+        .get("https://localhost:44315/api/professor")
+        .then((res) => res.json())
+        .then((professor) => {
+          this.professores = professor;
+          this.carregarAluno();
+          });
+    },
+    carregarAluno() {
+      this.$http
+        .get("https://localhost:44315/api/aluno/" + this.id)
+        .then((res) => res.json())
+        .then((aluno) => {
+          this.aluno = aluno;
+          this.loading = false;
+          });
+    },
+    editar() {
       this.visualizando = !this.visualizando;
     },
-    salvar(_aluno){
+    salvar(_aluno) {
       let _alunoEditar = {
         id: _aluno.id,
         nome: _aluno.nome,
         sobrenome: _aluno.sobrenome,
         dataNasc: _aluno.dataNasc,
-        professor: _aluno.professor,
-      }
+        professorId: _aluno.professor.id,
+      };
 
-       this.$http
-        .put(`http://localhost:3000/alunos/${_alunoEditar.id}`, _alunoEditar);
+      this.$http
+        .put(
+          `https://localhost:44315/api/aluno/${_alunoEditar.id}`,
+          _alunoEditar
+        )
+        .then((res) => res.json())
+        .then((aluno) => (this.aluno = aluno))
+        .then(() => this.visualizando = true);
 
-            this.visualizando = !this.visualizando;
-
-    },
-    cancelar(){
       this.visualizando = !this.visualizando;
-    }
+    },
+    cancelar() {
+      this.visualizando = !this.visualizando;
+    },
   },
 };
 </script>
 
 <style scoped>
-
-.btnEditar{
+.btnEditar {
   float: right;
   background-color: rgb(76, 186, 249);
 }
-.btnSalvar{
+.btnSalvar {
   float: right;
   background-color: rgb(79, 196, 68);
 }
-.btnCancelar{
+.btnCancelar {
   float: left;
   background-color: rgb(249, 186, 92);
 }
 
-.colPequeno{
+.colPequeno {
   width: 20%;
 }
 
-input, select{
+input,
+select {
   margin: 0px;
   padding: 5px 10px;
   font-size: 0.9em;
@@ -138,10 +157,8 @@ input, select{
   width: 95%;
   background-color: rgb(245, 245, 245);
 }
-select{
+select {
   height: 38px;
   width: 30%;
 }
-
-
 </style>
